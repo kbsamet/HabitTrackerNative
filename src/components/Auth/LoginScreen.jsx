@@ -7,7 +7,10 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+} from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 
 const LoginScreen = () => {
@@ -28,12 +31,30 @@ const LoginScreen = () => {
   }
 
   return (
-    <View style={{padding: 20, marginTop: 50}}>
-      <Button title="Login" onPress={onGoogleButtonPress} />
+    <View style={styles.container}>
+      <Text style={styles.text}>Habit Tracker</Text>
+      <GoogleSigninButton
+        size={GoogleSigninButton.Size.Wide}
+        color={GoogleSigninButton.Color.Dark}
+        onPress={onGoogleButtonPress}
+      />
     </View>
   );
 };
 
 export default LoginScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    marginTop: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    marginBottom: 50,
+    color: 'white',
+  },
+});

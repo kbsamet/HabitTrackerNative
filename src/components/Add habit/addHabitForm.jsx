@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
+import {tableColor} from '../../consts/colors';
 
 const AddHabitForm = ({addHabit}) => {
   const [habitName, setHabitName] = useState('');
@@ -14,6 +15,7 @@ const AddHabitForm = ({addHabit}) => {
   return (
     <View style={styles.form}>
       <TextInput
+        placeholderTextColor="#eeeeee"
         placeholder="Habit name"
         style={styles.textInput}
         value={habitName}
@@ -49,6 +51,7 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     color: 'white',
     marginRight: 10,
+    backgroundColor: tableColor,
   },
 
   button: {
@@ -58,9 +61,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 4,
     elevation: 3,
-    backgroundColor: '#ffffff00',
     borderWidth: 1,
     borderColor: 'white',
+    backgroundColor: tableColor,
   },
   buttonText: {
     color: '#ffffff',

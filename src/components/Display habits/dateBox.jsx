@@ -1,9 +1,15 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
+import {tableColor} from '../../consts/colors';
 
-const DateBox = ({text}) => {
+const DateBox = ({text, onEdge}) => {
   return (
-    <View style={styles.box}>
+    <View
+      style={{
+        ...styles.box,
+        backgroundColor: tableColor,
+        borderTopLeftRadius: onEdge ? 10 : 0,
+      }}>
       <Text style={styles.text}>{text}</Text>
     </View>
   );

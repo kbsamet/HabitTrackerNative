@@ -1,12 +1,15 @@
 import {StyleSheet, Text, TouchableHighlight, View} from 'react-native';
 import React, {useState} from 'react';
 import {habitColors} from '../../consts/colors';
+import {updateHabitState} from '../../services/habitService';
 
-const HabitBox = () => {
-  const [habitState, setHabitState] = useState(0);
+const HabitBox = ({name, index, initialState}) => {
+  const [habitState, setHabitState] = useState(initialState);
 
   const onClick = () => {
-    setHabitState((habitState + 1) % 4);
+    var newState = (habitState + 1) % 4;
+    setHabitState(newState);
+    updateHabitState(name, index, newState);
   };
 
   return (
@@ -25,5 +28,6 @@ const styles = StyleSheet.create({
 
     borderWidth: 1,
     borderColor: 'white',
+    backgroundColor: 'red',
   },
 });

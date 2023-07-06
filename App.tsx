@@ -6,33 +6,40 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, StyleSheet, View} from 'react-native';
-import {NUM_OF_DAYS} from './consts/globals';
-import HabitsView from './components/Display habits/habitView';
-import AddHabitForm from './components/Add habit/addHabitForm';
-import LoginScreen from './components/Auth/LoginScreen';
-import {backgroundColors} from './consts/colors';
+import {Pressable, SafeAreaView, StyleSheet, View} from 'react-native';
+import HabitsView from './src/components/Display habits/habitView';
+import AddHabitForm from './src/components/Add habit/addHabitForm';
+import LoginScreen from './src/components/Auth/LoginScreen';
+import {backgroundColors} from './src/consts/colors';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {MenuProvider} from 'react-native-popup-menu';
+import EditMenu from './src/components/Menu/Menu';
+import {
+  createNewHabit,
+  deleteHabit,
+  getHabits,
+} from './src/services/habitService';
 
 function App(): JSX.Element {
   const backgroundColor = backgroundColors[new Date().getDay()];
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  const [editingItems, setEditingItems] = useState(false);
+  const [uid, setUid] = useState();
 
-  const [habitData, setHabitData] = useState({
-    names: ['Gym', 'Guitar', 'Coding', 'Reading'],
-    data: [
-      Array(NUM_OF_DAYS).fill(0),
-      Array(NUM_OF_DAYS).fill(0),
-      Array(NUM_OF_DAYS).fill(0),
-      Array(NUM_OF_DAYS).fill(0),
-    ],
-  });
+  const [habitData, setHabitData] = useState();
 
   // Handle user state changes
-  function onAuthStateChanged(user_: any) {
+  async function onAuthStateChanged(user_: any) {
     setUser(user_);
+    if (user_ !== null) {
+      var habits = await getHabits(user_.uid);
+      setHabitData(habits);
+      setUid(user_.uid);
+      console.log(habits);
+    }
+
     if (initializing) {
       setInitializing(false);
     }
@@ -44,6 +51,7 @@ function App(): JSX.Element {
         '132172467389-t1v53cfsmrsuvmk8mq3tg25si2sf9r36.apps.googleusercontent.com',
     });
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+
     return subscriber; // unsubscribe on unmount
   }, []);
 
@@ -51,32 +59,67 @@ function App(): JSX.Element {
     return null;
   }
 
-  const addHabit = (name: string) => {
+  const editItems = () => {
+    setEditingItems(!editingItems);
+  };
+
+  const addHabit = async (name: string) => {
+    createNewHabit(uid, name);
     var newHabitData = {...habitData};
-    newHabitData.names.push(name);
-    newHabitData.data.push(Array(NUM_OF_DAYS).fill(0));
-    console.log(newHabitData);
+    newHabitData[name] = {
+      data: [
+        {
+          date: new Date().toString(),
+          data: Array(50).fill(0),
+        },
+      ],
+    };
     setHabitData(newHabitData);
   };
 
+  const onDeleteHabit = (habitName: string) => {
+    deleteHabit(habitName);
+    var newHabitData = {...habitData};
+    delete newHabitData[habitName];
+    setHabitData(newHabitData);
+    setEditingItems(false);
+  };
+
   return (
-    <SafeAreaView
-      style={{...styles.container, backgroundColor: backgroundColor}}>
-      {user ? (
-        <View>
-          <AddHabitForm addHabit={addHabit} />
-          <HabitsView habits={habitData} />
-        </View>
-      ) : (
-        <LoginScreen />
-      )}
-    </SafeAreaView>
+    <MenuProvider>
+      <SafeAreaView
+        style={{...styles.container, backgroundColor: backgroundColor}}>
+        {user ? (
+          <Pressable onPress={() => setEditingItems(false)}>
+            <View style={styles.header}>
+              <View />
+              <AddHabitForm addHabit={addHabit} />
+
+              <EditMenu editItems={editItems} />
+            </View>
+            <HabitsView
+              habits={habitData}
+              editMode={editingItems}
+              onDeleteHabit={onDeleteHabit}
+            />
+          </Pressable>
+        ) : (
+          <LoginScreen />
+        )}
+      </SafeAreaView>
+    </MenuProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    margin: 10,
   },
 });
 

@@ -7,7 +7,7 @@ import {NUM_OF_DAYS} from '../../consts/globals';
 import NameBox from './NameBox';
 import DateBox from './dateBox';
 
-const HabitsView = ({habits}) => {
+const HabitsView = ({habits, editMode, onDeleteHabit}) => {
   const [dateNames, setDateNames] = useState([]);
   useEffect(() => {
     const newDateNames = [];
@@ -29,9 +29,15 @@ const HabitsView = ({habits}) => {
         <ScrollView horizontal={true}>
           <Col>
             <Row style={{height: 50, marginBottom: 10}}>
-              <DateBox text={''} />
-              {habits.names.map((name, index) => (
-                <NameBox key={index} text={name} />
+              <DateBox text={''} onEdge={true} />
+              {Object.keys(habits).map((name, index) => (
+                <NameBox
+                  key={index}
+                  text={name}
+                  editMode={editMode}
+                  onDeleteHabit={() => onDeleteHabit(name)}
+                  onEdge={index === Object.keys(habits).length - 1}
+                />
               ))}
             </Row>
 
@@ -42,11 +48,18 @@ const HabitsView = ({habits}) => {
                     <DateBox key={index} text={dateName} />
                   ))}
                 </Col>
-                {habits.data.map((habits, index) => (
+                {Object.values(habits).map((habitData, index) => (
                   <Col key={index}>
-                    {habits.map((habit, index) => (
-                      <HabitBox key={index} habitState={habit} />
-                    ))}
+                    {habitData.data[habitData.data.length - 1].data.map(
+                      (habit, i) => (
+                        <HabitBox
+                          name={Object.keys(habits)[index]}
+                          key={i}
+                          initialState={habit}
+                          index={[habitData.data.length - 1, i]}
+                        />
+                      ),
+                    )}
                   </Col>
                 ))}
               </Row>
