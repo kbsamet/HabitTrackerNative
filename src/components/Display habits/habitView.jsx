@@ -1,15 +1,23 @@
 import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 import HabitBox from './habitBox';
 import {Col, Row, Grid} from 'react-native-easy-grid';
-import {monthNames} from '../../consts/date';
+import {daysIntoYear, monthNames} from '../../consts/date';
 import {NUM_OF_DAYS} from '../../consts/globals';
 import NameBox from './NameBox';
 import DateBox from './dateBox';
 
 const HabitsView = ({habits, editMode, onDeleteHabit}) => {
   const [dateNames, setDateNames] = useState([]);
+
+  const [dataSourceCords, setDataSourceCords] = useState([]);
+  let ref = createRef();
+
+  const year = new Date().getFullYear();
+  const day = daysIntoYear(new Date());
+
   useEffect(() => {
+    console.log(day);
     const newDateNames = [];
     const today = new Date();
     for (let i = 0; i < NUM_OF_DAYS; i++) {
@@ -22,6 +30,15 @@ const HabitsView = ({habits, editMode, onDeleteHabit}) => {
 
     setDateNames(newDateNames);
   }, []);
+
+  useEffect(() => {
+    console.log(ref.current.scrollTo);
+    ref.current.scrollTo({
+      x: 0,
+      y: dataSourceCords[new Date().getDate() - 1],
+      animated: true,
+    });
+  }, [dataSourceCords, ref]);
 
   return (
     <View style={styles.grid}>
@@ -41,7 +58,7 @@ const HabitsView = ({habits, editMode, onDeleteHabit}) => {
               ))}
             </Row>
 
-            <ScrollView>
+            <ScrollView ref={ref}>
               <Row>
                 <Col style={{width: 75}}>
                   {dateNames.map((dateName, index) => (
@@ -50,16 +67,22 @@ const HabitsView = ({habits, editMode, onDeleteHabit}) => {
                 </Col>
                 {Object.values(habits).map((habitData, index) => (
                   <Col key={index}>
-                    {habitData.data[habitData.data.length - 1].data.map(
-                      (habit, i) => (
+                    {habitData.data[year]
+                      .slice(day - NUM_OF_DAYS, day)
+                      .reverse()
+                      .map((habit, i) => (
                         <HabitBox
                           name={Object.keys(habits)[index]}
                           key={i}
                           initialState={habit}
-                          index={[habitData.data.length - 1, i]}
+                          index={[year, day - i - 1]}
+                          onLayout={event => {
+                            const layout = event.nativeEvent.layout;
+                            dataSourceCords[i] = layout.y;
+                            setDataSourceCords(dataSourceCords);
+                          }}
                         />
-                      ),
-                    )}
+                      ))}
                   </Col>
                 ))}
               </Row>

@@ -48,7 +48,7 @@ function App(): JSX.Element {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        '132172467389-t1v53cfsmrsuvmk8mq3tg25si2sf9r36.apps.googleusercontent.com',
+        '132172467389-ecspj25d3ppvm4lirv6vc7l9099r67vv.apps.googleusercontent.com',
     });
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
 
@@ -67,12 +67,9 @@ function App(): JSX.Element {
     createNewHabit(uid, name);
     var newHabitData = {...habitData};
     newHabitData[name] = {
-      data: [
-        {
-          date: new Date().toString(),
-          data: Array(50).fill(0),
-        },
-      ],
+      data: {
+        [new Date().getFullYear()]: Array(365).fill(0),
+      },
     };
     setHabitData(newHabitData);
   };

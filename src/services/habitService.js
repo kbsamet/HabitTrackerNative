@@ -16,16 +16,9 @@ const checkHabitDates = async uid => {
   var habits = res.data();
   var today = new Date();
   Object.entries(habits).forEach(([key, value]) => {
-    var lastDate = new Date(value.data[value.data.length - 1].date);
-    if (
-      Math.round(today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24) >
-      50
-    ) {
-      var newDate = new Date();
-      value.data.push({
-        date: newDate.toString(),
-        data: Array(50).fill(0),
-      });
+    var year = new Date().getFullYear().toString();
+    if (!Object.keys(value.data).includes(year)) {
+      value.data[year] = Array(365).fill(0);
       firestore()
         .collection('habits')
         .doc(uid)
@@ -41,7 +34,9 @@ export const updateHabitState = async (habitName, index, state) => {
     var uid = auth().currentUser.uid;
     var res = await firestore().collection('habits').doc(uid).get();
     var newData = res.data()[habitName].data;
-    newData[index[0]].data[index[1]] = state;
+    newData[index[0]][index[1]] = state;
+    console.log(index[1]);
+    console.log(state);
     await firestore()
       .collection('habits')
       .doc(uid)
@@ -69,19 +64,15 @@ export const deleteHabit = async habitName => {
 
 export const createNewHabit = async (uid, habitName) => {
   try {
-    var today = new Date();
-    console.log(uid);
+    var year = new Date().getFullYear();
     await firestore()
       .collection('habits')
       .doc(uid)
       .update({
         [habitName]: {
-          data: [
-            {
-              date: today.toString(),
-              data: Array(50).fill(0),
-            },
-          ],
+          data: {
+            [year.toString()]: Array(365).fill(0),
+          },
         },
       });
   } catch (error) {
@@ -90,19 +81,15 @@ export const createNewHabit = async (uid, habitName) => {
 };
 
 export const createNewHabits = async uid => {
-  var fiftyDaysAgo = new Date();
-  fiftyDaysAgo.setDate(fiftyDaysAgo.getDate() - 51);
+  var year = new Date().getFullYear();
   await firestore()
     .collection('habits')
     .doc(uid)
     .set({
       Gym: {
-        data: [
-          {
-            date: fiftyDaysAgo.toString(),
-            data: Array(50).fill(0),
-          },
-        ],
+        data: {
+          [year.toString()]: Array(365).fill(0),
+        },
       },
     });
 };
