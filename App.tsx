@@ -6,7 +6,13 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {Pressable, SafeAreaView, StyleSheet, View} from 'react-native';
+import {
+  Dimensions,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import HabitsView from './src/components/Display habits/habitView';
 import AddHabitForm from './src/components/Add habit/addHabitForm';
 import LoginScreen from './src/components/Auth/LoginScreen';
@@ -20,6 +26,8 @@ import {
   deleteHabit,
   getHabits,
 } from './src/services/habitService';
+import {createNewNotes, getNotes} from './src/services/noteService';
+import {isPortrait} from './src/services/dimensions';
 
 function App(): JSX.Element {
   const backgroundColor = backgroundColors[new Date().getDay()];
@@ -27,8 +35,18 @@ function App(): JSX.Element {
   const [user, setUser] = useState();
   const [editingItems, setEditingItems] = useState(false);
   const [uid, setUid] = useState();
-
+  const [isLandscape, setIsLandscape] = useState(!isPortrait());
   const [habitData, setHabitData] = useState();
+
+  useEffect(() => {
+    const callback = () => setIsLandscape(!isPortrait());
+
+    var handler = Dimensions.addEventListener('change', callback);
+
+    return () => {
+      handler.remove();
+    };
+  }, []);
 
   // Handle user state changes
   async function onAuthStateChanged(user_: any) {
@@ -84,11 +102,14 @@ function App(): JSX.Element {
 
   return (
     <MenuProvider>
-      <SafeAreaView
-        style={{...styles.container, backgroundColor: backgroundColor}}>
+      <View style={{...styles.container, backgroundColor: backgroundColor}}>
         {user ? (
           <Pressable onPress={() => setEditingItems(false)}>
-            <View style={styles.header}>
+            <View
+              style={{
+                ...styles.header,
+                marginTop: isLandscape ? 10 : 70,
+              }}>
               <View />
               <AddHabitForm addHabit={addHabit} />
 
@@ -98,12 +119,13 @@ function App(): JSX.Element {
               habits={habitData}
               editMode={editingItems}
               onDeleteHabit={onDeleteHabit}
+              isLandscape={isLandscape}
             />
           </Pressable>
         ) : (
           <LoginScreen />
         )}
-      </SafeAreaView>
+      </View>
     </MenuProvider>
   );
 }

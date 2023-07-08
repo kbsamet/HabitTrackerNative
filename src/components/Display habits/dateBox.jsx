@@ -1,17 +1,48 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {
+  LayoutAnimation,
+  StyleSheet,
+  Text,
+  Touchable,
+  TouchableHighlight,
+  View,
+} from 'react-native';
 import React from 'react';
 import {tableColor} from '../../consts/colors';
+import LinearGradient from 'react-native-linear-gradient';
 
-const DateBox = ({text, onEdge}) => {
+const DateBox = ({
+  text,
+  onEdge,
+  setExpandedNoteIndex,
+  index,
+  expandedNoteIndex,
+}) => {
+  const onPress = () => {
+    if (index == null) {
+      return;
+    }
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpandedNoteIndex(prev => (prev === index ? -1 : index));
+  };
+
   return (
-    <View
-      style={{
-        ...styles.box,
-        backgroundColor: tableColor,
-        borderTopLeftRadius: onEdge ? 10 : 0,
-      }}>
-      <Text style={styles.text}>{text}</Text>
-    </View>
+    <LinearGradient
+      colors={
+        expandedNoteIndex === index && !onEdge
+          ? [tableColor, tableColor]
+          : [tableColor, tableColor]
+      }
+      style={styles.linearGradient}>
+      <TouchableHighlight
+        onPress={onPress}
+        style={{
+          ...styles.box,
+          borderTopLeftRadius: onEdge ? 10 : 0,
+          borderBottomWidth: expandedNoteIndex === index ? 0 : 1,
+        }}>
+        <Text style={styles.text}>{text}</Text>
+      </TouchableHighlight>
+    </LinearGradient>
   );
 };
 
@@ -26,10 +57,15 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     borderWidth: 1,
   },
-
   text: {
     fontSize: 18,
     textAlign: 'center',
     color: 'white',
+  },
+  linearGradient: {
+    width: 75,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

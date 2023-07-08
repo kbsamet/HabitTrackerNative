@@ -8,14 +8,14 @@
   '#C38D9E',
 ];*/
 export const backgroundColors = [
+  '#666666',
   '#ababab',
   '#ababab',
   '#ababab',
   '#ababab',
-  '#ababab',
-  '#ababab',
+  '#555555',
   '#ababab',
 ];
-export const tableColor = '#888888';
+export const tableColor = '#333333';
 
 export const habitColors = ['#eeeeee', '#C0EDA4', '#9CE270', '#6FA14F'];

@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {habitColors} from '../../consts/colors';
 import {updateHabitState} from '../../services/habitService';
 
-const HabitBox = ({name, index, initialState}) => {
+const HabitBox = ({name, index, initialState, isLandscape}) => {
   const [habitState, setHabitState] = useState(initialState);
 
   const onClick = () => {
@@ -13,8 +13,14 @@ const HabitBox = ({name, index, initialState}) => {
   };
 
   return (
-    <TouchableHighlight onPressIn={onClick} activeOpacity={0.9}>
-      <View style={{...styles.box, backgroundColor: habitColors[habitState]}} />
+    <TouchableHighlight onPress={onClick} activeOpacity={0.9}>
+      <View
+        style={{
+          ...styles.box,
+          backgroundColor: habitColors[habitState],
+          width: isLandscape ? 150 : 100,
+        }}
+      />
     </TouchableHighlight>
   );
 };
@@ -23,11 +29,10 @@ export default HabitBox;
 
 const styles = StyleSheet.create({
   box: {
-    width: 75,
+    width: 100,
     height: 60,
 
     borderWidth: 1,
     borderColor: 'white',
-    backgroundColor: 'red',
   },
 });

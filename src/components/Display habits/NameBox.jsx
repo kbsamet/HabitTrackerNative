@@ -4,13 +4,14 @@ import Icon from 'react-native-vector-icons/dist/Entypo';
 import {deleteHabit} from '../../services/habitService';
 import {tableColor} from '../../consts/colors';
 
-const NameBox = ({text, editMode, onDeleteHabit, onEdge}) => {
+const NameBox = ({text, editMode, onDeleteHabit, onEdge, isLandscape}) => {
   return (
     <View
       style={{
         ...styles.box,
         backgroundColor: tableColor,
         borderTopEndRadius: onEdge ? 10 : 0,
+        width: isLandscape ? 150 : 100,
       }}>
       {editMode ? (
         <Icon
@@ -30,7 +31,7 @@ export default NameBox;
 
 const styles = StyleSheet.create({
   box: {
-    width: 75,
+    width: 100,
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',

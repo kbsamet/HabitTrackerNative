@@ -1,10 +1,11 @@
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import {createNewNote, createNewNotes} from './noteService';
 
 export const getHabits = async uid => {
   var res = await firestore().collection('habits').doc(uid).get();
   if (res.data() == null) {
-    createNewHabits(uid);
+    await createNewHabits(uid);
   }
   checkHabitDates(uid);
   var res = await firestore().collection('habits').doc(uid).get();
@@ -35,8 +36,6 @@ export const updateHabitState = async (habitName, index, state) => {
     var res = await firestore().collection('habits').doc(uid).get();
     var newData = res.data()[habitName].data;
     newData[index[0]][index[1]] = state;
-    console.log(index[1]);
-    console.log(state);
     await firestore()
       .collection('habits')
       .doc(uid)
@@ -73,8 +72,12 @@ export const createNewHabit = async (uid, habitName) => {
           data: {
             [year.toString()]: Array(365).fill(0),
           },
+          notes: {
+            [year.toString()]: Array(365).fill(''),
+          },
         },
       });
+    await createNewNote(uid, habitName);
   } catch (error) {
     console.log(error);
   }
@@ -89,6 +92,9 @@ export const createNewHabits = async uid => {
       Gym: {
         data: {
           [year.toString()]: Array(365).fill(0),
+        },
+        notes: {
+          [year.toString()]: Array(365).fill(''),
         },
       },
     });

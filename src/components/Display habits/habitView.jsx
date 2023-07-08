@@ -1,4 +1,11 @@
-import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  Dimensions,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import React, {createRef, useEffect, useState} from 'react';
 import HabitBox from './habitBox';
 import {Col, Row, Grid} from 'react-native-easy-grid';
@@ -6,18 +13,21 @@ import {daysIntoYear, monthNames} from '../../consts/date';
 import {NUM_OF_DAYS} from '../../consts/globals';
 import NameBox from './NameBox';
 import DateBox from './dateBox';
+import NoteBox from './noteBox';
+import NoteDivider from './noteDivider';
+import {isPortrait} from '../../services/dimensions';
 
-const HabitsView = ({habits, editMode, onDeleteHabit}) => {
+const HabitsView = ({habits, editMode, onDeleteHabit, isLandscape}) => {
   const [dateNames, setDateNames] = useState([]);
 
   const [dataSourceCords, setDataSourceCords] = useState([]);
+  const [expandedNoteIndex, setExpandedNoteIndex] = useState(-1);
   let ref = createRef();
 
   const year = new Date().getFullYear();
   const day = daysIntoYear(new Date());
 
   useEffect(() => {
-    console.log(day);
     const newDateNames = [];
     const today = new Date();
     for (let i = 0; i < NUM_OF_DAYS; i++) {
@@ -54,6 +64,7 @@ const HabitsView = ({habits, editMode, onDeleteHabit}) => {
                   editMode={editMode}
                   onDeleteHabit={() => onDeleteHabit(name)}
                   onEdge={index === Object.keys(habits).length - 1}
+                  isLandscape={isLandscape}
                 />
               ))}
             </Row>
@@ -62,7 +73,19 @@ const HabitsView = ({habits, editMode, onDeleteHabit}) => {
               <Row>
                 <Col style={{width: 75}}>
                   {dateNames.map((dateName, index) => (
-                    <DateBox key={index} text={dateName} />
+                    <>
+                      <DateBox
+                        key={index}
+                        text={dateName}
+                        setExpandedNoteIndex={setExpandedNoteIndex}
+                        index={index}
+                        expandedNoteIndex={expandedNoteIndex}
+                      />
+                      <NoteDivider
+                        expanded={index === expandedNoteIndex}
+                        key={'note' + index}
+                      />
+                    </>
                   ))}
                 </Col>
                 {Object.values(habits).map((habitData, index) => (
@@ -71,17 +94,28 @@ const HabitsView = ({habits, editMode, onDeleteHabit}) => {
                       .slice(day - NUM_OF_DAYS, day)
                       .reverse()
                       .map((habit, i) => (
-                        <HabitBox
-                          name={Object.keys(habits)[index]}
-                          key={i}
-                          initialState={habit}
-                          index={[year, day - i - 1]}
-                          onLayout={event => {
-                            const layout = event.nativeEvent.layout;
-                            dataSourceCords[i] = layout.y;
-                            setDataSourceCords(dataSourceCords);
-                          }}
-                        />
+                        <>
+                          <HabitBox
+                            name={Object.keys(habits)[index]}
+                            key={i}
+                            initialState={habit}
+                            index={[year, day - i - 1]}
+                            onLayout={event => {
+                              const layout = event.nativeEvent.layout;
+                              dataSourceCords[i] = layout.y;
+                              setDataSourceCords(dataSourceCords);
+                            }}
+                            isLandscape={isLandscape}
+                          />
+                          <NoteBox
+                            expanded={i === expandedNoteIndex}
+                            key={'note' + i}
+                            habitName={Object.keys(habits)[index]}
+                            index={[year, day - i - 1]}
+                            note={habitData.notes[year][day - i - 1]}
+                            isLandscape={isLandscape}
+                          />
+                        </>
                       ))}
                   </Col>
                 ))}
