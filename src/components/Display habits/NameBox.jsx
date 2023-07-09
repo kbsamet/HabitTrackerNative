@@ -4,7 +4,14 @@ import Icon from 'react-native-vector-icons/dist/Entypo';
 import {deleteHabit} from '../../services/habitService';
 import {tableColor} from '../../consts/colors';
 
-const NameBox = ({text, editMode, onDeleteHabit, onEdge, isLandscape}) => {
+const NameBox = ({
+  text,
+  editMode,
+  onDeleteHabit,
+  onMoveHabit,
+  onEdge,
+  isLandscape,
+}) => {
   return (
     <View
       style={{
@@ -13,15 +20,28 @@ const NameBox = ({text, editMode, onDeleteHabit, onEdge, isLandscape}) => {
         borderTopEndRadius: onEdge ? 10 : 0,
         width: isLandscape ? 150 : 100,
       }}>
-      {editMode ? (
-        <Icon
-          name="trash"
-          size={20}
-          color={'#d90909'}
-          onPress={onDeleteHabit}
-        />
-      ) : (
-        <Text style={styles.text}>{text}</Text>
+      <Text style={styles.text}>{text}</Text>
+      {editMode && (
+        <View style={styles.iconView}>
+          <Icon
+            name="arrow-left"
+            size={20}
+            color={'#dddddd'}
+            onPress={() => onMoveHabit(text, -1)}
+          />
+          <Icon
+            name="trash"
+            size={20}
+            color={'#d90909'}
+            onPress={onDeleteHabit}
+          />
+          <Icon
+            name="arrow-right"
+            size={20}
+            color={'#dddddd'}
+            onPress={() => onMoveHabit(text, 1)}
+          />
+        </View>
       )}
     </View>
   );
@@ -37,6 +57,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: 'white',
     borderWidth: 1,
+  },
+  iconView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 5,
   },
 
   text: {

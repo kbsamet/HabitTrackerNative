@@ -1,4 +1,5 @@
 import {
+  AppState,
   Dimensions,
   FlatList,
   ScrollView,
@@ -6,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {createRef, useEffect, useState} from 'react';
+import React, {createRef, useEffect, useRef, useState} from 'react';
 import HabitBox from './habitBox';
 import {Col, Row, Grid} from 'react-native-easy-grid';
 import {daysIntoYear, monthNames} from '../../consts/date';
@@ -15,22 +16,52 @@ import NameBox from './NameBox';
 import DateBox from './dateBox';
 import NoteBox from './noteBox';
 import NoteDivider from './noteDivider';
-import {isPortrait} from '../../services/dimensions';
+import {isCloseToBottom} from '../../consts/helpers';
 
-const HabitsView = ({habits, editMode, onDeleteHabit, isLandscape}) => {
+const HabitsView = ({
+  habits,
+  editMode,
+  onDeleteHabit,
+  isLandscape,
+  onMoveHabit,
+  refreshHabits,
+}) => {
   const [dateNames, setDateNames] = useState([]);
 
   const [dataSourceCords, setDataSourceCords] = useState([]);
   const [expandedNoteIndex, setExpandedNoteIndex] = useState(-1);
   let ref = createRef();
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
+  const [day, setDay] = useState(daysIntoYear(new Date()));
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [offset, setOffset] = useState(0);
 
-  const year = new Date().getFullYear();
-  const day = daysIntoYear(new Date());
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        console.log('App has come to the foreground!');
+        setDay(daysIntoYear(new Date()));
+        setYear(new Date().getFullYear());
+        refreshHabits();
+      }
+
+      appState.current = nextAppState;
+      setAppStateVisible(appState.current);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     const newDateNames = [];
     const today = new Date();
-    for (let i = 0; i < NUM_OF_DAYS; i++) {
+    for (let i = 0; i < NUM_OF_DAYS + offset; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
       newDateNames.push(
@@ -39,16 +70,15 @@ const HabitsView = ({habits, editMode, onDeleteHabit, isLandscape}) => {
     }
 
     setDateNames(newDateNames);
-  }, []);
+  }, [offset]);
 
-  useEffect(() => {
-    console.log(ref.current.scrollTo);
+  const scrollToTop = () => {
     ref.current.scrollTo({
       x: 0,
       y: dataSourceCords[new Date().getDate() - 1],
       animated: true,
     });
-  }, [dataSourceCords, ref]);
+  };
 
   return (
     <View style={styles.grid}>
@@ -56,7 +86,7 @@ const HabitsView = ({habits, editMode, onDeleteHabit, isLandscape}) => {
         <ScrollView horizontal={true}>
           <Col>
             <Row style={{height: 50, marginBottom: 10}}>
-              <DateBox text={''} onEdge={true} />
+              <DateBox text={''} onEdge={true} scrollToTop={scrollToTop} />
               {Object.keys(habits).map((name, index) => (
                 <NameBox
                   key={index}
@@ -65,11 +95,20 @@ const HabitsView = ({habits, editMode, onDeleteHabit, isLandscape}) => {
                   onDeleteHabit={() => onDeleteHabit(name)}
                   onEdge={index === Object.keys(habits).length - 1}
                   isLandscape={isLandscape}
+                  onMoveHabit={onMoveHabit}
                 />
               ))}
             </Row>
 
-            <ScrollView ref={ref}>
+            <ScrollView
+              ref={ref}
+              onScroll={e => {
+                if (isCloseToBottom(e.nativeEvent)) {
+                  console.log('bottom');
+                  setOffset(offset + 10);
+                }
+              }}
+              scrollEventThrottle={400}>
               <Row>
                 <Col style={{width: 75}}>
                   {dateNames.map((dateName, index) => (
@@ -88,15 +127,15 @@ const HabitsView = ({habits, editMode, onDeleteHabit, isLandscape}) => {
                     </>
                   ))}
                 </Col>
-                {Object.values(habits).map((habitData, index) => (
+                {Object.keys(habits).map((habitName, index) => (
                   <Col key={index}>
-                    {habitData.data[year]
-                      .slice(day - NUM_OF_DAYS, day)
+                    {habits[habitName].data[year]
+                      .slice(day - NUM_OF_DAYS - offset, day)
                       .reverse()
                       .map((habit, i) => (
                         <>
                           <HabitBox
-                            name={Object.keys(habits)[index]}
+                            name={habitName}
                             key={i}
                             initialState={habit}
                             index={[year, day - i - 1]}
@@ -110,9 +149,9 @@ const HabitsView = ({habits, editMode, onDeleteHabit, isLandscape}) => {
                           <NoteBox
                             expanded={i === expandedNoteIndex}
                             key={'note' + i}
-                            habitName={Object.keys(habits)[index]}
+                            habitName={habitName}
                             index={[year, day - i - 1]}
-                            note={habitData.notes[year][day - i - 1]}
+                            note={habits[habitName].notes[year][day - i - 1]}
                             isLandscape={isLandscape}
                           />
                         </>

@@ -6,13 +6,7 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {
-  Dimensions,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {Dimensions, Pressable, StyleSheet, View} from 'react-native';
 import HabitsView from './src/components/Display habits/habitView';
 import AddHabitForm from './src/components/Add habit/addHabitForm';
 import LoginScreen from './src/components/Auth/LoginScreen';
@@ -25,9 +19,11 @@ import {
   createNewHabit,
   deleteHabit,
   getHabits,
+  updateHabitOrder,
 } from './src/services/habitService';
-import {createNewNotes, getNotes} from './src/services/noteService';
-import {isPortrait} from './src/services/dimensions';
+import {isPortrait} from './src/consts/helpers';
+import {createNewNotes} from './src/services/noteService';
+import {firebase} from '@react-native-firebase/firestore';
 
 function App(): JSX.Element {
   const backgroundColor = backgroundColors[new Date().getDay()];
@@ -55,13 +51,39 @@ function App(): JSX.Element {
       var habits = await getHabits(user_.uid);
       setHabitData(habits);
       setUid(user_.uid);
-      console.log(habits);
     }
 
     if (initializing) {
       setInitializing(false);
     }
   }
+
+  async function refreshHabits() {
+    var habits = await getHabits(firebase.auth().currentUser!.uid);
+    setHabitData(habits);
+  }
+
+  const onMoveHabit = async (name: string, direction: int) => {
+    console.log(Object.keys(habitData));
+    var newOrder = [...Object.keys(habitData)];
+    if (direction === -1 && newOrder.indexOf(name) === 0) {
+      return;
+    }
+    if (direction === 1 && newOrder.indexOf(name) === newOrder.length - 1) {
+      return;
+    }
+    var index = newOrder.indexOf(name);
+    var temp = newOrder[index];
+    newOrder[index] = newOrder[index + direction];
+    newOrder[index + direction] = temp;
+    var newHabitData = {};
+    newOrder.forEach(habitName => {
+      newHabitData[habitName] = habitData[habitName];
+    });
+    updateHabitOrder(uid, newOrder);
+
+    setHabitData(newHabitData);
+  };
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -88,6 +110,9 @@ function App(): JSX.Element {
       data: {
         [new Date().getFullYear()]: Array(365).fill(0),
       },
+      notes: {
+        [new Date().getFullYear()]: Array(365).fill(''),
+      },
     };
     setHabitData(newHabitData);
   };
@@ -109,6 +134,7 @@ function App(): JSX.Element {
               style={{
                 ...styles.header,
                 marginTop: isLandscape ? 10 : 70,
+                marginLeft: isLandscape ? 50 : 10,
               }}>
               <View />
               <AddHabitForm addHabit={addHabit} />
@@ -120,6 +146,8 @@ function App(): JSX.Element {
               editMode={editingItems}
               onDeleteHabit={onDeleteHabit}
               isLandscape={isLandscape}
+              onMoveHabit={onMoveHabit}
+              refreshHabits={refreshHabits}
             />
           </Pressable>
         ) : (

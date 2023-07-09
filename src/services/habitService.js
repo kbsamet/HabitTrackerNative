@@ -9,7 +9,28 @@ export const getHabits = async uid => {
   }
   checkHabitDates(uid);
   var res = await firestore().collection('habits').doc(uid).get();
-  return res.data();
+  var order = await getHabitOrder(uid);
+  //sort habit keys based on order
+  var habits = {};
+  order.forEach(habitName => {
+    habits[habitName] = res.data()[habitName];
+  });
+  return habits;
+};
+
+const getHabitOrder = async uid => {
+  var res = await firestore().collection('habitOrders').doc(uid).get();
+  return res.data().order;
+};
+
+export const updateHabitOrder = async (uid, order) => {
+  try {
+    await firestore().collection('habitOrders').doc(uid).set({
+      order: order,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const checkHabitDates = async uid => {
@@ -19,7 +40,10 @@ const checkHabitDates = async uid => {
   Object.entries(habits).forEach(([key, value]) => {
     var year = new Date().getFullYear().toString();
     if (!Object.keys(value.data).includes(year)) {
+      console.log('year not found');
+      console.log(key);
       value.data[year] = Array(365).fill(0);
+      value.notes[year] = Array(365).fill('');
       firestore()
         .collection('habits')
         .doc(uid)
@@ -42,6 +66,7 @@ export const updateHabitState = async (habitName, index, state) => {
       .update({
         [habitName]: {
           data: newData,
+          notes: res.data()[habitName].notes,
         },
       });
   } catch (error) {
@@ -56,6 +81,12 @@ export const deleteHabit = async habitName => {
     var newData = res.data();
     delete newData[habitName];
     await firestore().collection('habits').doc(uid).set(newData);
+    await firestore()
+      .collection('habitOrders')
+      .doc(uid)
+      .update({
+        order: firestore.FieldValue.arrayRemove(habitName),
+      });
   } catch (error) {
     console.log(error);
   }
@@ -77,7 +108,12 @@ export const createNewHabit = async (uid, habitName) => {
           },
         },
       });
-    await createNewNote(uid, habitName);
+    await firestore()
+      .collection('habitOrders')
+      .doc(uid)
+      .update({
+        order: firestore.FieldValue.arrayUnion(habitName),
+      });
   } catch (error) {
     console.log(error);
   }
@@ -97,5 +133,12 @@ export const createNewHabits = async uid => {
           [year.toString()]: Array(365).fill(''),
         },
       },
+    });
+
+  await firestore()
+    .collection('habitOrders')
+    .doc(uid)
+    .set({
+      order: ['Gym'],
     });
 };
