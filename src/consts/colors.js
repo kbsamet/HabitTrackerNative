@@ -1,11 +1,11 @@
 export const backgroundColors = [
   '#35676b',
-  '#E2A482',
-  '#DC9F87',
-  '#D69B8D',
-  '#CF9693',
-  '#C99298',
-  '#C38D9E',
+  '#35676b',
+  '#35676b',
+  '#35676b',
+  '#35676b',
+  '#35676b',
+  '#35676b',
 ];
 /*
 export const backgroundColors = [

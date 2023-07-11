@@ -21,6 +21,7 @@ import {isCloseToBottom} from '../../consts/helpers';
 const HabitsView = ({
   habits,
   editMode,
+  setEditMode,
   onDeleteHabit,
   isLandscape,
   onMoveHabit,
@@ -61,7 +62,11 @@ const HabitsView = ({
   useEffect(() => {
     const newDateNames = [];
     const today = new Date();
-    for (let i = 0; i < NUM_OF_DAYS + offset; i++) {
+    for (
+      let i = 0;
+      i < Math.min(NUM_OF_DAYS + offset, daysIntoYear(today));
+      i++
+    ) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
       newDateNames.push(
@@ -96,6 +101,7 @@ const HabitsView = ({
                   onEdge={index === Object.keys(habits).length - 1}
                   isLandscape={isLandscape}
                   onMoveHabit={onMoveHabit}
+                  setEditMode={setEditMode}
                 />
               ))}
             </Row>
@@ -104,7 +110,9 @@ const HabitsView = ({
               ref={ref}
               onScroll={e => {
                 if (isCloseToBottom(e.nativeEvent)) {
-                  console.log('bottom');
+                  if (day - NUM_OF_DAYS - offset < 0) {
+                    return;
+                  }
                   setOffset(offset + 10);
                 }
               }}
@@ -130,7 +138,7 @@ const HabitsView = ({
                 {Object.keys(habits).map((habitName, index) => (
                   <Col key={index}>
                     {habits[habitName].data[year]
-                      .slice(day - NUM_OF_DAYS - offset, day)
+                      .slice(Math.max(0, day - NUM_OF_DAYS - offset), day)
                       .reverse()
                       .map((habit, i) => (
                         <>

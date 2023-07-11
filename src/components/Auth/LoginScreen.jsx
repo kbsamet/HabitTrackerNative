@@ -1,5 +1,6 @@
 import {
   Button,
+  LayoutAnimation,
   StyleSheet,
   Text,
   TextInput,
@@ -14,7 +15,17 @@ import {
 import auth from '@react-native-firebase/auth';
 
 const LoginScreen = () => {
-  async function onGoogleButtonPress() {
+  const [expanded, setExpanded] = useState(false);
+
+  function onGoogleButtonPress() {
+    LayoutAnimation.configureNext(
+      LayoutAnimation.create(500, 'easeInEaseOut', 'opacity'),
+    );
+    setExpanded(true);
+    setTimeout(signIn, 500);
+  }
+
+  async function signIn() {
     try {
       // Check if your device supports Google Play
       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
@@ -27,13 +38,21 @@ const LoginScreen = () => {
       return auth().signInWithCredential(googleCredential);
     } catch (error) {
       console.log(error);
+      LayoutAnimation.configureNext(
+        LayoutAnimation.create(500, 'easeInEaseOut', 'opacity'),
+      );
+      setExpanded(false);
     }
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Habit Tracker</Text>
-      <View style={styles.loginContainer}>
+    <View style={{marginTop: expanded ? 0 : 200}}>
+      <Text style={styles.header}>{expanded ? '' : 'Habit Tracker'}</Text>
+      <View
+        style={{
+          ...styles.loginContainer,
+          marginTop: expanded ? 0 : 50,
+        }}>
         <GoogleSigninButton
           size={GoogleSigninButton.Size.Wide}
           color={GoogleSigninButton.Color.Dark}
@@ -47,9 +66,6 @@ const LoginScreen = () => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 200,
-  },
   welcomeText: {
     fontSize: 25,
     width: '100%',
@@ -59,12 +75,11 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   loginContainer: {
-    marginTop: 50,
+    paddingTop: 50,
     borderTopEndRadius: 20,
     borderTopStartRadius: 20,
     height: '100%',
     width: '100%',
-    paddingTop: 50,
     backgroundColor: '#333333',
     alignItems: 'center',
   },
