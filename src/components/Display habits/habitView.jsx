@@ -85,7 +85,9 @@ const HabitsView = ({
     });
   };
 
-  return (
+  return !habits ? (
+    <View />
+  ) : (
     <View style={styles.grid}>
       <Grid style={styles.grid}>
         <ScrollView horizontal={true}>

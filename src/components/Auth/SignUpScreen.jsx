@@ -1,102 +1,60 @@
 import {
   Animated,
-  Button,
-  Easing,
-  Image,
-  LayoutAnimation,
   StyleSheet,
   Text,
-  TextInput,
   TouchableHighlight,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-} from '@react-native-google-signin/google-signin';
+import {backgroundColors, habitColors} from '../../consts/colors';
 import LoginInputField from './loginInputField';
-import {habitColors} from '../../consts/colors';
-import {signInEmail, signInGoogle} from '../../services/userService';
+import {signInEmail, signUpEmail} from '../../services/userService';
 import {useNavigation} from '@react-navigation/native';
 
-const LoginScreen = () => {
+const SignUpScreen = () => {
   const navigator = useNavigation();
-
-  const [expanded, setExpanded] = useState(false);
-  const [_animatedValue] = useState(new Animated.Value(1));
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const onLoginPress = async () => {
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const onSignUpPress = async () => {
     try {
-      await signInEmail(email, password);
+      if (email === '' || password === '' || confirmPassword === '') {
+        setErrorMessage('Please fill in all fields');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setErrorMessage('Passwords do not match');
+        return;
+      }
+      await signUpEmail(email, password);
+      navigator.navigate('Home');
     } catch (error) {
       console.log(error);
-      setShowErrorMessage(true);
+      if (error.code === 'auth/email-already-in-use') {
+        setErrorMessage('Email already in use');
+      } else if (error.code === 'auth/invalid-email') {
+        setErrorMessage('Invalid email');
+      } else if (error.code === 'auth/weak-password') {
+        setErrorMessage('Weak password');
+      }
     }
   };
 
-  function onGoogleButtonPress() {
-    Animated.timing(_animatedValue, {
-      toValue: 0,
-      duration: 500,
-      easing: Easing.ease,
-      useNativeDriver: true,
-    }).start();
-    LayoutAnimation.configureNext(
-      LayoutAnimation.create(500, 'easeInEaseOut', 'scaleXY'),
-    );
-    setExpanded(true);
-    setTimeout(signInWithGoogle, 500);
-  }
-
-  async function signInWithGoogle() {
-    try {
-      signInGoogle();
-    } catch (error) {
-      console.log(error);
-      LayoutAnimation.configureNext(
-        LayoutAnimation.create(500, 'easeInEaseOut', 'scaleXY'),
-      );
-      setExpanded(false);
-      Animated.timing(_animatedValue, {
-        toValue: 1,
-        duration: 500,
-        easing: Easing.ease,
-        useNativeDriver: true,
-      }).start();
-    }
-  }
-
   return (
-    <View style={{marginTop: expanded ? 0 : 100}}>
+    <View style={styles.container}>
       <Animated.Image
         source={require('../../assets/icon.png')}
         style={{
           width: 150,
           height: 150,
-          opacity: _animatedValue,
           alignSelf: 'center',
           borderRadius: 10,
-          marginBottom: 10,
-          transform: [
-            {
-              scale: _animatedValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 1],
-              }),
-            },
-          ],
+          marginBottom: 30,
         }}
       />
-      <View
-        style={{
-          ...styles.loginContainer,
-          marginTop: expanded ? 0 : 50,
-        }}>
+      <View style={styles.loginContainer}>
         <Text style={styles.header}>{'Welcome to Habit Tracker '}</Text>
         <View style={styles.loginField}>
           <Text style={styles.text}>Email</Text>
@@ -112,14 +70,21 @@ const LoginScreen = () => {
             setValue={setPassword}
             hidden={true}
           />
-          {showErrorMessage && (
-            <Text style={styles.errorMessage}>Incorrect mail or password</Text>
+          <Text style={styles.text}>Confirm Password</Text>
+          <LoginInputField
+            placeholder={'Confirm Password'}
+            iconName={'lock-closed'}
+            setValue={setConfirmPassword}
+            hidden={true}
+          />
+          {errorMessage !== '' && (
+            <Text style={styles.errorMessage}>{errorMessage}</Text>
           )}
           <View style={{alignItems: 'center'}}>
             <TouchableHighlight
               style={styles.loginButton}
-              onPress={onLoginPress}>
-              <Text style={styles.text}>Login</Text>
+              onPress={onSignUpPress}>
+              <Text style={styles.text}>Sign Up</Text>
             </TouchableHighlight>
           </View>
           <View
@@ -128,34 +93,25 @@ const LoginScreen = () => {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <Text style={styles.h2}>Don't have an account? </Text>
-            <TouchableHighlight onPress={() => navigator.navigate('Signup')}>
-              <Text style={styles.signUpButton}> Sign Up</Text>
+            <Text style={styles.h2}>Already have an account? </Text>
+            <TouchableHighlight onPress={() => navigator.navigate('Home')}>
+              <Text style={styles.signUpButton}> Login</Text>
             </TouchableHighlight>
           </View>
-          <View
-            style={{
-              paddingTop: 10,
-              borderBottomColor: 'white',
-              borderBottomWidth: 1,
-              marginBottom: 5,
-            }}
-          />
-          <Text style={styles.h2}>Or</Text>
         </View>
-        <GoogleSigninButton
-          size={GoogleSigninButton.Size.Wide}
-          color={GoogleSigninButton.Color.Dark}
-          onPress={onGoogleButtonPress}
-        />
       </View>
     </View>
   );
 };
 
-export default LoginScreen;
+export default SignUpScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    paddingTop: 100,
+    backgroundColor: backgroundColors[0],
+    flex: 1,
+  },
   loginContainer: {
     paddingTop: 50,
     borderTopEndRadius: 20,

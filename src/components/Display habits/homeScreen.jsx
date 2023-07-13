@@ -88,10 +88,6 @@ const HomeScreen = () => {
     return subscriber; // unsubscribe on unmount
   }, []);
 
-  if (initializing) {
-    return null;
-  }
-
   const addHabit = async name => {
     createNewHabit(uid, name);
     var newHabitData = {...habitData};
@@ -117,28 +113,32 @@ const HomeScreen = () => {
   return (
     <View style={{...styles.container, backgroundColor: backgroundColor}}>
       {user ? (
-        <Pressable onPress={() => setEditingItems(false)}>
-          <View
-            style={{
-              ...styles.header,
-              marginTop: isLandscape ? 10 : 70,
-              marginLeft: isLandscape ? 50 : 10,
-            }}>
-            <View />
-            <AddHabitForm addHabit={addHabit} />
+        initializing ? (
+          <View />
+        ) : (
+          <Pressable onPress={() => setEditingItems(false)}>
+            <View
+              style={{
+                ...styles.header,
+                marginTop: isLandscape ? 10 : 70,
+                marginLeft: isLandscape ? 50 : 10,
+              }}>
+              <View />
+              <AddHabitForm addHabit={addHabit} />
 
-            <EditMenu editItems={editItems} />
-          </View>
-          <HabitsView
-            habits={habitData}
-            editMode={editingItems}
-            onDeleteHabit={onDeleteHabit}
-            isLandscape={isLandscape}
-            onMoveHabit={onMoveHabit}
-            refreshHabits={refreshHabits}
-            setEditMode={setEditingItems}
-          />
-        </Pressable>
+              <EditMenu editItems={editItems} />
+            </View>
+            <HabitsView
+              habits={habitData}
+              editMode={editingItems}
+              onDeleteHabit={onDeleteHabit}
+              isLandscape={isLandscape}
+              onMoveHabit={onMoveHabit}
+              refreshHabits={refreshHabits}
+              setEditMode={setEditingItems}
+            />
+          </Pressable>
+        )
       ) : (
         <LoginScreen />
       )}
