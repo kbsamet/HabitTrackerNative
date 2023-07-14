@@ -1,17 +1,31 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {
+  LayoutAnimation,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+} from 'react-native';
 import React from 'react';
 import {tableColor} from '../../consts/colors';
 import LinearGradient from 'react-native-linear-gradient';
 
-const NoteDivider = ({expanded}) => {
+const NoteDivider = ({expanded, setExpandedNoteIndex}) => {
+  const onPress = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+    setExpandedNoteIndex(-1);
+  };
+
   return (
     expanded && (
-      <View style={styles.container}>
-        <LinearGradient
-          colors={[tableColor, '#444444']}
-          style={styles.linerGradient}
-        />
-      </View>
+      <TouchableHighlight onPress={onPress}>
+        <View style={styles.container}>
+          <LinearGradient
+            colors={[tableColor, '#444444']}
+            style={styles.linerGradient}
+          />
+        </View>
+      </TouchableHighlight>
     )
   );
 };

@@ -3,7 +3,9 @@ import {
   Button,
   Easing,
   Image,
+  KeyboardAvoidingView,
   LayoutAnimation,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -20,6 +22,7 @@ import LoginInputField from './loginInputField';
 import {habitColors} from '../../consts/colors';
 import {signInEmail, signInGoogle} from '../../services/userService';
 import {useNavigation} from '@react-navigation/native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const LoginScreen = () => {
   const navigator = useNavigation();
@@ -72,84 +75,89 @@ const LoginScreen = () => {
   }
 
   return (
-    <View style={{marginTop: expanded ? 0 : 100}}>
-      <Animated.Image
-        source={require('../../assets/icon.png')}
-        style={{
-          width: 150,
-          height: 150,
-          opacity: _animatedValue,
-          alignSelf: 'center',
-          borderRadius: 10,
-          marginBottom: 10,
-          transform: [
-            {
-              scale: _animatedValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 1],
-              }),
-            },
-          ],
-        }}
-      />
-      <View
-        style={{
-          ...styles.loginContainer,
-          marginTop: expanded ? 0 : 50,
-        }}>
-        <Text style={styles.header}>{'Welcome to Habit Tracker '}</Text>
-        <View style={styles.loginField}>
-          <Text style={styles.text}>Email</Text>
-          <LoginInputField
-            placeholder={'Email'}
-            iconName={'person'}
-            setValue={setEmail}
-          />
-          <Text style={styles.text}>Password</Text>
-          <LoginInputField
-            placeholder={'Password'}
-            iconName={'lock-closed'}
-            setValue={setPassword}
-            hidden={true}
-          />
-          {showErrorMessage && (
-            <Text style={styles.errorMessage}>Incorrect mail or password</Text>
-          )}
-          <View style={{alignItems: 'center'}}>
-            <TouchableHighlight
-              style={styles.loginButton}
-              onPress={onLoginPress}>
-              <Text style={styles.text}>Login</Text>
-            </TouchableHighlight>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Text style={styles.h2}>Don't have an account? </Text>
-            <TouchableHighlight onPress={() => navigator.navigate('Signup')}>
-              <Text style={styles.signUpButton}> Sign Up</Text>
-            </TouchableHighlight>
-          </View>
-          <View
-            style={{
-              paddingTop: 10,
-              borderBottomColor: 'white',
-              borderBottomWidth: 1,
-              marginBottom: 5,
-            }}
-          />
-          <Text style={styles.h2}>Or</Text>
-        </View>
-        <GoogleSigninButton
-          size={GoogleSigninButton.Size.Wide}
-          color={GoogleSigninButton.Color.Dark}
-          onPress={onGoogleButtonPress}
+    <KeyboardAwareScrollView>
+      <View style={{marginTop: expanded ? 0 : 100}}>
+        <Animated.Image
+          source={require('../../assets/icon.png')}
+          style={{
+            width: 150,
+            height: 150,
+            opacity: _animatedValue,
+            alignSelf: 'center',
+            borderRadius: 10,
+            marginBottom: 10,
+            transform: [
+              {
+                scale: _animatedValue.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 1],
+                }),
+              },
+            ],
+          }}
         />
+        <View
+          style={{
+            ...styles.loginContainer,
+            marginTop: expanded ? 0 : 50,
+          }}>
+          <Text style={styles.header}>{'Welcome to Habit Tracker '}</Text>
+          <View style={styles.loginField}>
+            <Text style={styles.text}>Email</Text>
+            <LoginInputField
+              placeholder={'Email'}
+              iconName={'person'}
+              setValue={setEmail}
+            />
+            <Text style={styles.text}>Password</Text>
+            <LoginInputField
+              placeholder={'Password'}
+              iconName={'lock-closed'}
+              setValue={setPassword}
+              hidden={true}
+            />
+
+            {showErrorMessage && (
+              <Text style={styles.errorMessage}>
+                Incorrect mail or password
+              </Text>
+            )}
+            <View style={{alignItems: 'center'}}>
+              <TouchableHighlight
+                style={styles.loginButton}
+                onPress={onLoginPress}>
+                <Text style={styles.text}>Login</Text>
+              </TouchableHighlight>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text style={styles.h2}>Don't have an account? </Text>
+              <TouchableHighlight onPress={() => navigator.navigate('Signup')}>
+                <Text style={styles.signUpButton}> Sign Up</Text>
+              </TouchableHighlight>
+            </View>
+            <View
+              style={{
+                paddingTop: 10,
+                borderBottomColor: 'white',
+                borderBottomWidth: 1,
+                marginBottom: 5,
+              }}
+            />
+            <Text style={styles.h2}>Or</Text>
+          </View>
+          <GoogleSigninButton
+            size={GoogleSigninButton.Size.Wide}
+            color={GoogleSigninButton.Color.Dark}
+            onPress={onGoogleButtonPress}
+          />
+        </View>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 

@@ -7,7 +7,14 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {createRef, useEffect, useRef, useState} from 'react';
+import React, {
+  createRef,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import HabitBox from './habitBox';
 import {Col, Row, Grid} from 'react-native-easy-grid';
 import {daysIntoYear, monthNames} from '../../consts/date';
@@ -17,16 +24,20 @@ import DateBox from './dateBox';
 import NoteBox from './noteBox';
 import NoteDivider from './noteDivider';
 import {isCloseToBottom} from '../../consts/helpers';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
-const HabitsView = ({
-  habits,
-  editMode,
-  setEditMode,
-  onDeleteHabit,
-  isLandscape,
-  onMoveHabit,
-  refreshHabits,
-}) => {
+const HabitsView = forwardRef(function HabitsView(
+  {
+    habits,
+    editMode,
+    setEditMode,
+    onDeleteHabit,
+    isLandscape,
+    onMoveHabit,
+    refreshHabits,
+  },
+  viewRef,
+) {
   const [dateNames, setDateNames] = useState([]);
 
   const [dataSourceCords, setDataSourceCords] = useState([]);
@@ -77,13 +88,23 @@ const HabitsView = ({
     setDateNames(newDateNames);
   }, [offset]);
 
-  const scrollToTop = () => {
+  const scrollToIndex = index => {
     ref.current.scrollTo({
       x: 0,
-      y: dataSourceCords[new Date().getDate() - 1],
+      y: dataSourceCords[index],
       animated: true,
     });
   };
+
+  useImperativeHandle(viewRef, () => ({
+    scrollToIndex(index) {
+      ref.current.scrollTo({
+        x: 0,
+        y: dataSourceCords[index],
+        animated: true,
+      });
+    },
+  }));
 
   return !habits ? (
     <View />
@@ -93,7 +114,11 @@ const HabitsView = ({
         <ScrollView horizontal={true}>
           <Col>
             <Row style={{height: 50, marginBottom: 10}}>
-              <DateBox text={''} onEdge={true} scrollToTop={scrollToTop} />
+              <DateBox
+                text={''}
+                onEdge={true}
+                scrollToTop={() => scrollToIndex(0)}
+              />
               {Object.keys(habits).map((name, index) => (
                 <NameBox
                   key={index}
@@ -129,8 +154,11 @@ const HabitsView = ({
                         setExpandedNoteIndex={setExpandedNoteIndex}
                         index={index}
                         expandedNoteIndex={expandedNoteIndex}
+                        setDataSourceCords={setDataSourceCords}
                       />
                       <NoteDivider
+                        setExpandedNoteIndex={setExpandedNoteIndex}
+                        index={index}
                         expanded={index === expandedNoteIndex}
                         key={'note' + index}
                       />
@@ -149,11 +177,6 @@ const HabitsView = ({
                             key={i}
                             initialState={habit}
                             index={[year, day - i - 1]}
-                            onLayout={event => {
-                              const layout = event.nativeEvent.layout;
-                              dataSourceCords[i] = layout.y;
-                              setDataSourceCords(dataSourceCords);
-                            }}
                             isLandscape={isLandscape}
                           />
                           <NoteBox
@@ -163,6 +186,7 @@ const HabitsView = ({
                             index={[year, day - i - 1]}
                             note={habits[habitName].notes[year][day - i - 1]}
                             isLandscape={isLandscape}
+                            onPress={() => scrollToIndex(i)}
                           />
                         </>
                       ))}
@@ -175,7 +199,7 @@ const HabitsView = ({
       </Grid>
     </View>
   );
-};
+});
 
 export default HabitsView;
 

@@ -10,6 +10,7 @@ import {backgroundColors, habitColors} from '../../consts/colors';
 import LoginInputField from './loginInputField';
 import {signInEmail, signUpEmail} from '../../services/userService';
 import {useNavigation} from '@react-navigation/native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const SignUpScreen = () => {
   const navigator = useNavigation();
@@ -43,64 +44,66 @@ const SignUpScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Animated.Image
-        source={require('../../assets/icon.png')}
-        style={{
-          width: 150,
-          height: 150,
-          alignSelf: 'center',
-          borderRadius: 10,
-          marginBottom: 30,
-        }}
-      />
-      <View style={styles.loginContainer}>
-        <Text style={styles.header}>{'Welcome to Habit Tracker '}</Text>
-        <View style={styles.loginField}>
-          <Text style={styles.text}>Email</Text>
-          <LoginInputField
-            placeholder={'Email'}
-            iconName={'person'}
-            setValue={setEmail}
-          />
-          <Text style={styles.text}>Password</Text>
-          <LoginInputField
-            placeholder={'Password'}
-            iconName={'lock-closed'}
-            setValue={setPassword}
-            hidden={true}
-          />
-          <Text style={styles.text}>Confirm Password</Text>
-          <LoginInputField
-            placeholder={'Confirm Password'}
-            iconName={'lock-closed'}
-            setValue={setConfirmPassword}
-            hidden={true}
-          />
-          {errorMessage !== '' && (
-            <Text style={styles.errorMessage}>{errorMessage}</Text>
-          )}
-          <View style={{alignItems: 'center'}}>
-            <TouchableHighlight
-              style={styles.loginButton}
-              onPress={onSignUpPress}>
-              <Text style={styles.text}>Sign Up</Text>
-            </TouchableHighlight>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Text style={styles.h2}>Already have an account? </Text>
-            <TouchableHighlight onPress={() => navigator.navigate('Home')}>
-              <Text style={styles.signUpButton}> Login</Text>
-            </TouchableHighlight>
+    <KeyboardAwareScrollView>
+      <View style={styles.container}>
+        <Animated.Image
+          source={require('../../assets/icon.png')}
+          style={{
+            width: 150,
+            height: 150,
+            alignSelf: 'center',
+            borderRadius: 10,
+            marginBottom: 30,
+          }}
+        />
+        <View style={styles.loginContainer}>
+          <Text style={styles.header}>{'Welcome to Habit Tracker '}</Text>
+          <View style={styles.loginField}>
+            <Text style={styles.text}>Email</Text>
+            <LoginInputField
+              placeholder={'Email'}
+              iconName={'person'}
+              setValue={setEmail}
+            />
+            <Text style={styles.text}>Password</Text>
+            <LoginInputField
+              placeholder={'Password'}
+              iconName={'lock-closed'}
+              setValue={setPassword}
+              hidden={true}
+            />
+            <Text style={styles.text}>Confirm Password</Text>
+            <LoginInputField
+              placeholder={'Confirm Password'}
+              iconName={'lock-closed'}
+              setValue={setConfirmPassword}
+              hidden={true}
+            />
+            {errorMessage !== '' && (
+              <Text style={styles.errorMessage}>{errorMessage}</Text>
+            )}
+            <View style={{alignItems: 'center'}}>
+              <TouchableHighlight
+                style={styles.loginButton}
+                onPress={onSignUpPress}>
+                <Text style={styles.text}>Sign Up</Text>
+              </TouchableHighlight>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text style={styles.h2}>Already have an account? </Text>
+              <TouchableHighlight onPress={() => navigator.navigate('Home')}>
+                <Text style={styles.signUpButton}> Login</Text>
+              </TouchableHighlight>
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 

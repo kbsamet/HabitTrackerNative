@@ -6,12 +6,7 @@ import Icon from 'react-native-vector-icons/dist/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import {firebase} from '@react-native-firebase/auth';
 import {deleteAccount} from '../../services/userService';
-import Dialog, {
-  DialogFooter,
-  DialogButton,
-  DialogTitle,
-  DialogContent,
-} from 'react-native-popup-dialog';
+import Dialog from 'react-native-dialog';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
@@ -46,32 +41,25 @@ const SettingsScreen = () => {
           setIsDialogVisible(true);
         }}
       />
-      <Dialog
-        visible={isDialogVisible}
-        dialogTitle={<DialogTitle title="Account Deletion" />}
-        footer={
-          <DialogFooter>
-            <DialogButton
-              text="Cancel"
-              onPress={() => {
-                setIsDialogVisible(false);
-              }}
-            />
-            <DialogButton
-              textStyle={{color: '#d90909', fontWeight: 'bold'}}
-              text="Yes"
-              onPress={() => {
-                handleModal();
-              }}
-            />
-          </DialogFooter>
-        }>
-        <DialogContent>
-          <Text style={{padding: 10}}>
-            Are you sure you want to delete your account ?
-          </Text>
-        </DialogContent>
-      </Dialog>
+      <Dialog.Container visible={isDialogVisible}>
+        <Dialog.Title>Account Deletion</Dialog.Title>
+        <Dialog.Description>
+          Are you sure you want to delete your account ?
+        </Dialog.Description>
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => {
+            setIsDialogVisible(false);
+          }}
+        />
+        <Dialog.Button
+          label="Yes"
+          color={'#d90909'}
+          onPress={() => {
+            handleModal();
+          }}
+        />
+      </Dialog.Container>
     </View>
   );
 };

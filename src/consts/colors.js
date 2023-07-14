@@ -19,4 +19,4 @@ export const backgroundColors = [
 ];*/
 export const tableColor = '#333333';
 
-export const habitColors = ['#eeeeee', '#C0EDA4', '#9CE270', '#6FA14F'];
+export const habitColors = ['#eeeeee', '#C0EDA4', '#9CE270', '#5cb524'];

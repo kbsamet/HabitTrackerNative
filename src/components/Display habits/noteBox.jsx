@@ -1,9 +1,15 @@
-import {StyleSheet, Text, TextInput, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableHighlight,
+  View,
+} from 'react-native';
 import React, {useEffect} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {tableColor} from '../../consts/colors';
 import {addNote} from '../../services/noteService';
-const NoteBox = ({expanded, note, habitName, index, isLandscape}) => {
+const NoteBox = ({expanded, note, habitName, index, isLandscape, onPress}) => {
   var ref = React.createRef();
   const [value, setValue] = React.useState(note);
 
@@ -19,6 +25,7 @@ const NoteBox = ({expanded, note, habitName, index, isLandscape}) => {
         style={{...styles.linerGradient, width: isLandscape ? 150 : 100}}>
         <TextInput
           ref={ref}
+          onFocus={onPress}
           placeholder="Add Note"
           placeholderTextColor={'#cccccc'}
           value={value}

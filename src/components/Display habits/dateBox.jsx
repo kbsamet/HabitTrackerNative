@@ -9,6 +9,7 @@ import {
 import React from 'react';
 import {habitColors, tableColor} from '../../consts/colors';
 import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/dist/Ionicons';
 
 const DateBox = ({
   text,
@@ -17,7 +18,19 @@ const DateBox = ({
   index,
   expandedNoteIndex,
   scrollToTop,
+  setDataSourceCords,
 }) => {
+  const onLayout = e => {
+    if (!setDataSourceCords) {
+      return;
+    }
+    const layout = e.nativeEvent.layout;
+    setDataSourceCords(prev => {
+      prev[index] = layout.y;
+      return prev;
+    });
+  };
+
   const onPress = () => {
     if (onEdge) {
       scrollToTop();
@@ -29,21 +42,33 @@ const DateBox = ({
   };
 
   return (
-    <TouchableHighlight
-      onPress={onPress}
-      style={{
-        ...styles.box,
-        borderTopLeftRadius: onEdge ? 10 : 0,
-        borderBottomWidth: expandedNoteIndex === index ? 0 : 1,
-      }}>
-      <Text
+    <View onLayout={e => onLayout(e)}>
+      <TouchableHighlight
+        onPress={onPress}
         style={{
-          ...styles.text,
-          color: expandedNoteIndex == index ? habitColors[1] : 'white',
+          ...styles.box,
+          borderTopLeftRadius: onEdge ? 10 : 0,
+          borderBottomWidth: expandedNoteIndex === index ? 0 : 1,
         }}>
-        {text}
-      </Text>
-    </TouchableHighlight>
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Text
+            style={{
+              ...styles.text,
+              color: expandedNoteIndex == index ? habitColors[1] : 'white',
+            }}>
+            {text}
+          </Text>
+          {text === '' && (
+            <Icon
+              name="ios-arrow-up"
+              size={28}
+              color={'#cccccc'}
+              style={{paddingBottom: 5}}
+            />
+          )}
+        </View>
+      </TouchableHighlight>
+    </View>
   );
 };
 

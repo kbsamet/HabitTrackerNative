@@ -15,8 +15,8 @@ const AddHabitForm = ({addHabit}) => {
   return (
     <View style={styles.form}>
       <TextInput
-        placeholderTextColor="#eeeeee"
-        placeholder="Habit name"
+        placeholderTextColor="#999999"
+        placeholder="Enter Habit name"
         style={styles.textInput}
         value={habitName}
         onChangeText={name => setHabitName(name)}
@@ -24,6 +24,9 @@ const AddHabitForm = ({addHabit}) => {
       <Pressable
         style={styles.button}
         onPress={() => {
+          if (habitName === '') {
+            return;
+          }
           addHabit(habitName);
           setHabitName('');
         }}>
@@ -45,7 +48,7 @@ const styles = StyleSheet.create({
 
   textInput: {
     padding: 10,
-    width: 100,
+    width: 150,
     borderWidth: 1,
     borderRadius: 5,
     borderColor: 'white',

@@ -5,10 +5,11 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import Icon from 'react-native-vector-icons/dist/Entypo';
 import {deleteHabit} from '../../services/habitService';
 import {tableColor} from '../../consts/colors';
+import Dialog from 'react-native-dialog';
 
 const NameBox = ({
   text,
@@ -19,6 +20,17 @@ const NameBox = ({
   isLandscape,
   setEditMode,
 }) => {
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const onDeletePress = () => {
+    setIsDialogVisible(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setIsDialogVisible(false);
+    console.log(isDialogVisible);
+    onDeleteHabit();
+  };
+
   return (
     <TouchableHighlight
       onLongPress={() => {
@@ -52,12 +64,32 @@ const NameBox = ({
               name="trash"
               size={20}
               color={'#d90909'}
-              onPress={onDeleteHabit}
+              onPress={onDeletePress}
             />
           </View>
         ) : (
           <Text style={styles.text}>{text}</Text>
         )}
+
+        <Dialog.Container visible={isDialogVisible}>
+          <Dialog.Title>Habit Deletion</Dialog.Title>
+          <Dialog.Description>
+            Are you sure you want to delete {text} ?
+          </Dialog.Description>
+          <Dialog.Button
+            label="Cancel"
+            onPress={() => {
+              setIsDialogVisible(false);
+            }}
+          />
+          <Dialog.Button
+            label="Yes"
+            color={'#d90909'}
+            onPress={() => {
+              handleDeleteConfirm();
+            }}
+          />
+        </Dialog.Container>
       </View>
     </TouchableHighlight>
   );

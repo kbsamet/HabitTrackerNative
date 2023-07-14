@@ -1,5 +1,5 @@
 import {Dimensions, Pressable, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import AddHabitForm from '../Add habit/addHabitForm';
 import EditMenu from '../Menu/Menu';
 import HabitsView from './habitView';
@@ -14,6 +14,7 @@ import {isPortrait} from '../../consts/helpers';
 import {firebase} from '@react-native-firebase/firestore';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import LoginScreen from '../Auth/LoginScreen';
+import Search from '../Menu/Search';
 
 const HomeScreen = () => {
   const [habitData, setHabitData] = useState();
@@ -23,6 +24,7 @@ const HomeScreen = () => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
   const [uid, setUid] = useState();
+  const viewRef = useRef();
 
   const editItems = () => {
     setEditingItems(!editingItems);
@@ -123,12 +125,13 @@ const HomeScreen = () => {
                 marginTop: isLandscape ? 10 : 70,
                 marginLeft: isLandscape ? 50 : 10,
               }}>
-              <View />
+              <Search onPress={index => viewRef.current.scrollToIndex(index)} />
               <AddHabitForm addHabit={addHabit} />
 
               <EditMenu editItems={editItems} />
             </View>
             <HabitsView
+              ref={viewRef}
               habits={habitData}
               editMode={editingItems}
               onDeleteHabit={onDeleteHabit}
@@ -156,6 +159,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 5,
     margin: 10,
   },
 });
