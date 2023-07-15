@@ -42,7 +42,7 @@ const DateBox = ({
   };
 
   return (
-    <View onLayout={e => onLayout(e)}>
+    <View>
       <TouchableHighlight
         onPress={onPress}
         style={{

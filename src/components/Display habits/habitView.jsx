@@ -24,7 +24,6 @@ import DateBox from './dateBox';
 import NoteBox from './noteBox';
 import NoteDivider from './noteDivider';
 import {isCloseToBottom} from '../../consts/helpers';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const HabitsView = forwardRef(function HabitsView(
   {
@@ -40,11 +39,12 @@ const HabitsView = forwardRef(function HabitsView(
 ) {
   const [dateNames, setDateNames] = useState([]);
 
-  const [dataSourceCords, setDataSourceCords] = useState([]);
+  //const [dataSourceCords, setDataSourceCords] = useState([]);
   const [expandedNoteIndex, setExpandedNoteIndex] = useState(-1);
   let ref = createRef();
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
+  const [scrollIndexOnRef, setScrollIndexOnRef] = useState(-1);
   const [day, setDay] = useState(daysIntoYear(new Date()));
   const [year, setYear] = useState(new Date().getFullYear());
   const [offset, setOffset] = useState(0);
@@ -89,20 +89,31 @@ const HabitsView = forwardRef(function HabitsView(
   }, [offset]);
 
   const scrollToIndex = index => {
-    ref.current.scrollTo({
-      x: 0,
-      y: dataSourceCords[index],
-      animated: true,
-    });
-  };
+    if (index >= NUM_OF_DAYS + offset) {
+      setOffset(index - NUM_OF_DAYS + 40);
+      setScrollIndexOnRef(index);
+      return;
+    }
 
-  useImperativeHandle(viewRef, () => ({
-    scrollToIndex(index) {
+    if (ref.current) {
       ref.current.scrollTo({
         x: 0,
-        y: dataSourceCords[index],
+        y: 60 * index,
         animated: true,
       });
+    }
+  };
+  useEffect(() => {
+    if (ref.current && scrollIndexOnRef !== -1) {
+      console.log('scrolling to index');
+      scrollToIndex(scrollIndexOnRef);
+      setScrollIndexOnRef(-1);
+    }
+  }, [ref, scrollIndexOnRef]);
+
+  useImperativeHandle(viewRef, () => ({
+    scroll(index) {
+      scrollToIndex(index);
     },
   }));
 
@@ -154,7 +165,7 @@ const HabitsView = forwardRef(function HabitsView(
                         setExpandedNoteIndex={setExpandedNoteIndex}
                         index={index}
                         expandedNoteIndex={expandedNoteIndex}
-                        setDataSourceCords={setDataSourceCords}
+                        //setDataSourceCords={setDataSourceCords}
                       />
                       <NoteDivider
                         setExpandedNoteIndex={setExpandedNoteIndex}

@@ -125,7 +125,7 @@ const HomeScreen = () => {
                 marginTop: isLandscape ? 10 : 70,
                 marginLeft: isLandscape ? 50 : 10,
               }}>
-              <Search onPress={index => viewRef.current.scrollToIndex(index)} />
+              <Search onPress={index => viewRef.current.scroll(index)} />
               <AddHabitForm addHabit={addHabit} />
 
               <EditMenu editItems={editItems} />

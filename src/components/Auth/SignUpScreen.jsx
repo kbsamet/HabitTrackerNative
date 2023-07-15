@@ -100,6 +100,20 @@ const SignUpScreen = () => {
                 <Text style={styles.signUpButton}> Login</Text>
               </TouchableHighlight>
             </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 10,
+              }}>
+              <Text style={styles.h3}>
+                By clicking signup you are agreeing to our
+              </Text>
+              <TouchableHighlight onPress={() => navigator.navigate('Terms')}>
+                <Text style={styles.termsButton}> Terms And Conditions</Text>
+              </TouchableHighlight>
+            </View>
           </View>
         </View>
       </View>
@@ -152,6 +166,21 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '400',
     color: habitColors[2],
+    textAlign: 'center',
+    marginTop: 5,
+    textDecorationLine: 'underline',
+  },
+  h3: {
+    fontSize: 10,
+    fontWeight: '400',
+    color: 'white',
+    textAlign: 'center',
+    marginTop: 5,
+  },
+  termsButton: {
+    fontSize: 10,
+    fontWeight: '400',
+    color: 'white',
     textAlign: 'center',
     marginTop: 5,
     textDecorationLine: 'underline',

@@ -12,6 +12,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './src/components/Display habits/homeScreen';
 import SettingsScreen from './src/components/Settings/settingsScreen';
 import SignUpScreen from './src/components/Auth/SignUpScreen';
+import PrivacyPolicyScreen from './src/components/Settings/privacyPolicy';
+import TermsAndConditionsScreen from './src/components/Auth/termsAndConditions';
 
 function App(): JSX.Element {
   const Stack = createNativeStackNavigator();
@@ -33,6 +35,16 @@ function App(): JSX.Element {
           options={{headerShown: false}}
           name="Signup"
           component={SignUpScreen}
+        />
+        <Stack.Screen
+          options={{headerShown: false}}
+          name="PrivacyPolicy"
+          component={PrivacyPolicyScreen}
+        />
+        <Stack.Screen
+          options={{headerShown: false}}
+          name="Terms"
+          component={TermsAndConditionsScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

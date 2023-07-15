@@ -1,10 +1,12 @@
 import {StyleSheet, Text, TouchableHighlight, View} from 'react-native';
 import React from 'react';
 
-const SettingsButton = ({text, onPress}) => {
+const SettingsButton = ({text, onPress, isRed = false}) => {
   return (
     <TouchableHighlight style={styles.buttonStyle} onPress={onPress}>
-      <Text style={styles.textStyle}>{text}</Text>
+      <Text style={{...styles.textStyle, color: isRed ? '#d90909' : 'black'}}>
+        {text}
+      </Text>
     </TouchableHighlight>
   );
 };
@@ -23,6 +25,5 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 18,
     marginLeft: 10,
-    color: '#d90909',
   },
 });

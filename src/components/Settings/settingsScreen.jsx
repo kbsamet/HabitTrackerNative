@@ -29,7 +29,15 @@ const SettingsScreen = () => {
         onPress={() => navigation.goBack()}
       />
       <SettingsButton
+        text={'Privacy Policy'}
+        onPress={() => {
+          navigation.navigate('PrivacyPolicy');
+        }}
+      />
+
+      <SettingsButton
         text={'Logout'}
+        isRed={true}
         onPress={() => {
           firebase.auth().signOut();
           navigation.goBack();
@@ -37,6 +45,7 @@ const SettingsScreen = () => {
       />
       <SettingsButton
         text={'Delete Account'}
+        isRed={true}
         onPress={() => {
           setIsDialogVisible(true);
         }}
